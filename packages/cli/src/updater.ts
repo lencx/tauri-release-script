@@ -124,6 +124,12 @@ export default async function updater() {
   });
   await Promise.allSettled(promises);
 
+  for (let [k, v] of Object.entries(updateData.platforms)) {
+    if (!v.signature || !v.url) {
+      delete (updateData.platforms as any).platforms[k];
+    }
+  }
+
   fs.writeFileSync(filename, JSON.stringify(updateData, null, 2));
   console.log(c.green('[✨ updater]'), c.green(relativePath(filename)), '\n');
   console.log(c.yellow('*'.repeat(20)));
