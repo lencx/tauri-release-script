@@ -14,8 +14,8 @@ export default async function updater() {
   let owner, repo;
 
   try {
-    owner = context?.repo?.owner;
-    repo = context?.repo?.repo;
+    owner = argv.owner || context?.repo?.owner;
+    repo = argv.repo || context?.repo?.repo;
   } catch(_) {
     if (argv.owner) {
       owner = argv.owner;
@@ -25,7 +25,7 @@ export default async function updater() {
     }
   }
 
-  if (!owner || !owner || !argv.token) {
+  if (!owner || !repo || !argv.token) {
     console.log(c.red('[💢 updater]'), '`owner`, `repo`, `token` are required.');
     process.exit(0);
   }
