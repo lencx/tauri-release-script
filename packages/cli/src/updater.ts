@@ -14,8 +14,8 @@ export default async function updater() {
   let owner, repo;
 
   try {
-    owner = context?.repo?.owner;
-    repo = context?.repo?.repo;
+    owner = argv.owner || context?.repo?.owner;
+    repo = argv.repo || context?.repo?.repo;
   } catch(_) {
     if (argv.owner) {
       owner = argv.owner;
@@ -25,7 +25,7 @@ export default async function updater() {
     }
   }
 
-  if (!owner || !owner || !argv.token) {
+  if (!owner || !repo || !argv.token) {
     console.log(c.red('[💢 updater]'), '`owner`, `repo`, `token` are required.');
     process.exit(0);
   }
@@ -123,6 +123,12 @@ export default async function updater() {
     await setAsset(asset, /.AppImage.tar.gz/, ['linux', 'linux-x86_64']);
   });
   await Promise.allSettled(promises);
+
+  for (let [k, v] of Object.entries(updateData.platforms)) {
+    if (!v.signature || !v.url) {
+      delete (updateData.platforms as any).platforms[k];
+    }
+  }
 
   fs.writeFileSync(filename, JSON.stringify(updateData, null, 2));
   console.log(c.green('[✨ updater]'), c.green(relativePath(filename)), '\n');
